@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Ruff, mypy, pytest, and the README's examples from the built wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: mypy
+      - run: pytest -q
+      - name: Build the wheel, install it clean, and diff the README's examples against real output
+        # Installing the wheel (not the source tree) proves the ISO schema
+        # actually ships inside the package.
+        run: |
+          pip install build && python -m build --wheel
+          python -m venv /tmp/wheel && /tmp/wheel/bin/pip install dist/*.whl
+          PATH="/tmp/wheel/bin:$PATH" ./scripts/check-readme.sh
+
+  secrets:
+    name: credsweep over the full commit history
+    runs-on: ubuntu-latest
+    steps:
+      # A shallow clone would let credsweep report a false all-clear.
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.27' }
+      - run: go install github.com/sriharifortitude/credsweep/cmd/credsweep@v0.1.2
+      - run: credsweep scan .

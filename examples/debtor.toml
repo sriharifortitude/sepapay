@@ -1,0 +1,6 @@
+# Who pays. The execution date is fixed so the example stays reproducible;
+# change it to a future TARGET2 business day to use this for real.
+name = "Müller & Söhne GmbH"
+iban = "DE89 3704 0044 0532 0130 00"
+bic = "COBADEFFXXX"
+execution_date = 2026-10-01
