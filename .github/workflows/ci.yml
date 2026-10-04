@@ -18,8 +18,8 @@ jobs:
     name: Ruff, mypy, pytest, and the README's examples from the built wheel
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
           cache: pip
@@ -41,9 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # A shallow clone would let credsweep report a false all-clear.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: { fetch-depth: 0 }
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with: { go-version: '1.27' }
       - run: go install github.com/sriharifortitude/credsweep/cmd/credsweep@v0.1.2
       - run: credsweep scan .
